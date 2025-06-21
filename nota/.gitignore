@@ -2,5 +2,9 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# Cursor-specific
 .cursor/
+
+# Reference files
 reference.js 
