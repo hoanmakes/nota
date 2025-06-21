@@ -83,6 +83,23 @@ button {
   background-color: #c50f0f;
 }
 
+.download-btn {
+  background-color: var(--secondary-background);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+.download-btn:hover {
+  background-color: var(--border-color);
+}
+
+.obsidian-btn {
+  background-color: #7d26cd; /* Obsidian-like purple */
+  color: white;
+}
+.obsidian-btn:hover {
+  background-color: #611e9f;
+}
+
 /* Form */
 #memo-form {
   display: flex;
