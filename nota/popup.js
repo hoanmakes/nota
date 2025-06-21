@@ -23,15 +23,19 @@ document.addEventListener('DOMContentLoaded', () => {
     memoForm.reset();
     memoIdInput.value = '';
     
-    // PRD: 현재 웹페이지 URL 자동 첨부
+    // PRD: 현재 웹페이지 URL 자동 첨부 & 본문 포커스
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0] && tabs[0].url) {
-        memoUrlInput.value = tabs[0].url;
+      if (tabs[0] && tabs[0].url && tabs[0].url.startsWith('http')) {
+        const url = tabs[0].url;
+        memoUrlInput.value = url;
+        memoContent.value = `Source : ${url}\n\n`;
       }
+      
+      // PRD: 커서는 본문 필드에 자동 포커스
+      memoContent.focus();
+      // 커서를 내용의 맨 끝으로 이동
+      memoContent.setSelectionRange(memoContent.value.length, memoContent.value.length);
     });
-
-    // PRD: 커서는 본문 필드에 자동 포커스
-    memoContent.focus();
   }
 
   async function renderMemos() {
