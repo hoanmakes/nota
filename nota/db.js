@@ -66,6 +66,19 @@ function getAllMemos() {
   });
 }
 
+function getMemo(id) {
+  return new Promise((resolve, reject) => {
+    initDB().then(db => {
+      const transaction = db.transaction([STORE_NAME], 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get(id);
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = (event) => reject('Error getting memo: ' + event.target.error);
+    });
+  });
+}
+
 function deleteMemo(id) {
   return new Promise((resolve, reject) => {
     initDB().then(db => {
@@ -77,4 +90,6 @@ function deleteMemo(id) {
       request.onerror = (event) => reject('Error deleting memo: ' + event.target.error);
     });
   });
-} 
+}
+
+export { initDB, addMemo, getAllMemos, getMemo, deleteMemo }; 
