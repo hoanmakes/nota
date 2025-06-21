@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const memoForm = document.getElementById('memo-form');
   const memoTitle = document.getElementById('memo-title');
+  const memoSource = document.getElementById('memo-source');
   const memoContent = document.getElementById('memo-content');
   const memoUrlInput = document.getElementById('memo-url');
   const memoIdInput = document.getElementById('memo-id');
@@ -39,13 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (tabs[0] && tabs[0].url && tabs[0].url.startsWith('http')) {
         const url = tabs[0].url;
         memoUrlInput.value = url;
-        memoContent.value = `Source : ${url}\n\n`;
+        memoSource.value = url;
+        memoContent.value = ''; // Clear memo content area
       }
       
       // PRD: 커서는 본문 필드에 자동 포커스
       memoContent.focus();
-      // 커서를 내용의 맨 끝으로 이동
-      memoContent.setSelectionRange(memoContent.value.length, memoContent.value.length);
     });
   }
 
@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const memo = await getMemo(memoId);
     if (memo) {
       detailTitle.textContent = memo.title || '제목 없음';
-      detailContent.textContent = memo.content;
+      const fullContent = `Source: ${memo.url}\n\n${memo.content}`;
+      detailContent.textContent = fullContent;
       detailView.classList.remove('hidden');
     } else {
       // Memo not found, go back to list
@@ -81,7 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="memo-item-header">
           <div class="memo-item-title">${memo.title || '제목 없음'}</div>
         </div>
-        <div class="memo-item-content">${memo.content.substring(0, 100)}...</div>
+        <div class="memo-item-source">${memo.url || ''}</div>
+        <div class="memo-item-content">${memo.content.substring(0, 80)}...</div>
         <div class="memo-item-actions">
            <button class="obsidian-btn" data-id="${memo.id}">Add to Obsidian</button>
            <button class="download-btn" data-id="${memo.id}">.md 다운로드</button>
@@ -109,8 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. 파일 내용 생성 (# 제목\n> URL\n\n본문)
     const titlePart = `# ${memo.title || '제목 없음'}`;
     const urlPart = `> ${memo.url}`;
-    const bodyOnly = memo.content.replace(/Source : .*\n\n?/, ''); // Source: 라인 제거
-    const fileContent = `${titlePart}\n${urlPart}\n\n${bodyOnly}`;
+    const fileContent = `${titlePart}\n${urlPart}\n\n${memo.content}`;
 
     // 3. 다운로드 실행
     const blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
@@ -165,8 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const titlePart = `# ${memo.title || '제목 없음'}`;
     const urlPart = `> Source: ${memo.url}`;
-    const bodyOnly = memo.content.replace(/Source : .*\n\n?/, '');
-    const fileContent = `${titlePart}\n${urlPart}\n\n${bodyOnly}`;
+    const fileContent = `${titlePart}\n${urlPart}\n\n${memo.content}`;
     console.log("Generated file content:", fileContent);
     
     const encodedVault = encodeURIComponent(obsidianVault);
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const memo = {
       title: memoTitle.value,
-      content: memoContent.value,
+      content: memoContent.value, // Now only user's note
       url: memoUrlInput.value,
       createdAt: new Date().toISOString()
     };

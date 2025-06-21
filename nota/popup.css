@@ -113,6 +113,11 @@ button {
   font-size: 14px;
 }
 
+#memo-form input[readonly] {
+  background-color: var(--background-color);
+  opacity: 0.7;
+}
+
 #memo-form textarea {
   min-height: 120px;
   resize: vertical;
@@ -144,10 +149,7 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .memo-item-title {
@@ -156,6 +158,15 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.memo-item-source {
+  font-size: 12px;
+  opacity: 0.6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 8px;
 }
 
 .memo-item-content {

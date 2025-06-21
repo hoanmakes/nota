@@ -27,7 +27,8 @@
       </header>
       <form id="memo-form">
         <input type="text" id="memo-title" placeholder="제목 (선택 사항)">
-        <textarea id="memo-content" placeholder="내용을 입력하세요..." required></textarea>
+        <input type="text" id="memo-source" placeholder="Source URL" readonly>
+        <textarea id="memo-content" placeholder="메모할 내용을 입력하세요..." required></textarea>
         <input type="hidden" id="memo-id">
         <input type="hidden" id="memo-url">
         <button type="submit" class="button-primary">저장</button>
