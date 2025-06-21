@@ -4,23 +4,32 @@ import { initDB, addMemo, getAllMemos, getMemo, deleteMemo } from './db.js';
 document.addEventListener('DOMContentLoaded', () => {
   const listView = document.getElementById('list-view');
   const formView = document.getElementById('form-view');
+  const detailView = document.getElementById('detail-view');
+
   const memoListContainer = document.getElementById('memo-list-container');
   const newMemoBtn = document.getElementById('new-memo-btn');
   const backToListBtn = document.getElementById('back-to-list-btn');
+  
   const memoForm = document.getElementById('memo-form');
   const memoTitle = document.getElementById('memo-title');
   const memoContent = document.getElementById('memo-content');
   const memoUrlInput = document.getElementById('memo-url');
   const memoIdInput = document.getElementById('memo-id');
 
+  const backToListFromDetailBtn = document.getElementById('back-to-list-from-detail-btn');
+  const detailTitle = document.getElementById('detail-title');
+  const detailContent = document.getElementById('detail-content');
+
   function switchToListView() {
     formView.classList.add('hidden');
+    detailView.classList.add('hidden');
     listView.classList.remove('hidden');
     renderMemos();
   }
 
   function switchToFormView() {
     listView.classList.add('hidden');
+    detailView.classList.add('hidden');
     formView.classList.remove('hidden');
     memoForm.reset();
     memoIdInput.value = '';
@@ -40,6 +49,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  async function switchToDetailView(memoId) {
+    listView.classList.add('hidden');
+    formView.classList.add('hidden');
+    
+    const memo = await getMemo(memoId);
+    if (memo) {
+      detailTitle.textContent = memo.title || '제목 없음';
+      detailContent.textContent = memo.content;
+      detailView.classList.remove('hidden');
+    } else {
+      // Memo not found, go back to list
+      switchToListView();
+    }
+  }
+
   async function renderMemos() {
     memoListContainer.innerHTML = '';
     const memos = await getAllMemos();
@@ -52,14 +76,15 @@ document.addEventListener('DOMContentLoaded', () => {
     memos.forEach(memo => {
       const div = document.createElement('div');
       div.className = 'memo-item';
+      div.dataset.id = memo.id;
       div.innerHTML = `
         <div class="memo-item-header">
           <div class="memo-item-title">${memo.title || '제목 없음'}</div>
         </div>
         <div class="memo-item-content">${memo.content.substring(0, 100)}...</div>
         <div class="memo-item-actions">
-           <button class="download-btn" data-id="${memo.id}">다운로드</button>
-           <button class="obsidian-btn" data-id="${memo.id}">Obsidian</button>
+           <button class="obsidian-btn" data-id="${memo.id}">Add to Obsidian</button>
+           <button class="download-btn" data-id="${memo.id}">.md 다운로드</button>
            <button class="button-danger delete-btn" data-id="${memo.id}">삭제</button>
         </div>
       `;
@@ -159,24 +184,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   memoListContainer.addEventListener('click', async (e) => {
-    if (e.target.classList.contains('delete-btn')) {
-      const memoId = Number(e.target.dataset.id);
-      if (confirm('정말로 이 메모를 삭제하시겠습니까?')) {
-        await deleteMemo(memoId);
-        renderMemos();
+    const target = e.target;
+    const memoId = Number(target.closest('.memo-item')?.dataset.id);
+
+    if (!memoId) return;
+
+    // Handle button clicks
+    if (target.tagName === 'BUTTON') {
+      if (target.classList.contains('delete-btn')) {
+        if (confirm('정말로 이 메모를 삭제하시겠습니까?')) {
+          await deleteMemo(memoId);
+          renderMemos();
+        }
+      } else if (target.classList.contains('download-btn')) {
+        handleDownload(memoId);
+      } else if (target.classList.contains('obsidian-btn')) {
+        handleAddToObsidian(memoId);
       }
-    } else if (e.target.classList.contains('download-btn')) {
-      const memoId = Number(e.target.dataset.id);
-      handleDownload(memoId);
-    } else if (e.target.classList.contains('obsidian-btn')) {
-      const memoId = Number(e.target.dataset.id);
-      handleAddToObsidian(memoId);
+      return;
     }
+    
+    // Handle click on memo item to see detail
+    switchToDetailView(memoId);
   });
 
   newMemoBtn.addEventListener('click', switchToFormView);
   backToListBtn.addEventListener('click', switchToListView);
-
+  backToListFromDetailBtn.addEventListener('click', switchToListView);
+  
   memoForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const memo = {
@@ -189,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     await addMemo(memo);
     switchToListView();
   });
-  
+
   // Initialize
   initDB().then(renderMemos);
 }); 

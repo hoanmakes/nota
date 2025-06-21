@@ -123,6 +123,8 @@ button {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .memo-item {
@@ -130,6 +132,12 @@ button {
   padding: 12px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.memo-item:hover {
+  background-color: var(--border-color);
 }
 
 .memo-item-header {
@@ -137,6 +145,9 @@ button {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
 }
 
 .memo-item-title {
@@ -159,4 +170,21 @@ button {
     margin-top: 10px;
     display: flex;
     gap: 8px;
+}
+
+/* Detail View */
+#detail-content-container {
+    padding: 0 8px;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+#detail-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 14px;
+    color: var(--text-color);
+    background-color: var(--secondary-background);
+    padding: 12px;
+    border-radius: 8px;
 } 
