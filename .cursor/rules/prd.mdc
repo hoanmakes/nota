@@ -1,0 +1,90 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+project: nota
+version: 1.0
+updated: 2025-06-16
+author: Hoan Shin
+
+context:
+  name: nota - 웹 캡처 & Markdown 메모 확장 도구
+  description: |
+    "nota"는 사용자가 웹 탐색 중 즉시 메모를 남기고, 현재 페이지 URL을 자동 첨부하여 Markdown(.md) 형식으로 저장할 수 있게 하는 Chrome 확장 프로그램입니다. 사용자는 Obsidian 등 외부 앱 없이 브라우저 내부에서 바로 정보를 수집하고 저장할 수 있습니다.
+  technology:
+    - Chrome Extension (Manifest v3)
+    - IndexedDB
+    - HTML/CSS/JS
+    - Markdown file generation
+  constraints:
+    - 오프라인 가동 필수
+    - 서버 없이 작동 (Pure client-side)
+    - Chrome 최신 버전, Edge Chromium 기반 호환성
+  non_functional:
+    - 로딩 시간: 500ms 이내
+    - 프라이버시: 데이터는 로컬에만 저장됨
+    - UX: 다크/라이트 자동 인식, 최소 클릭 흐름
+
+rules:
+  - id: memo.create
+    description: 메모 생성 창 열기 및 입력 인터페이스
+    priority: P0
+    behavior:
+      - 현재 웹페이지의 URL을 자동으로 메모에 첨부해야 함
+      - 메모 입력창은 단축키 또는 툴바 클릭으로 열림
+      - 커서는 본문 입력 필드에 자동 포커스되어야 함
+      - 제목 입력 필드는 선택 사항, 본문은 Markdown 문법을 지원
+
+  - id: memo.save
+    description: 메모를 로컬 DB에 저장
+    priority: P0
+    behavior:
+      - 저장 시 타임스탬프 자동 부여
+      - 오프라인 상태에서도 정상 저장 가능해야 함
+      - 저장된 메모는 추후 편집 및 다운로드가 가능해야 함
+
+  - id: memo.list
+    description: 저장된 메모 목록을 보여주는 리스트 UI
+    priority: P0
+    behavior:
+      - 확장 아이콘 클릭 시 최근순 정렬로 메모 리스트 표시
+      - 제목 및 본문에 대한 간단한 검색 기능 포함
+
+  - id: memo.download
+    description: 메모를 Markdown 형식(.md)으로 다운로드
+    priority: P0
+    behavior:
+      - 클릭 한 번으로 .md 파일 다운로드 가능해야 함
+      - 파일명은 yyyy-mm-dd_hhmm_<slug>.md 포맷을 따름
+      - 파일 내용 구조:
+        - # 제목
+        - > URL
+        - 본문 (Markdown)
+
+  - id: memo.clip_selection
+    description: 선택한 텍스트를 메모로 캡처
+    priority: P1
+    behavior:
+      - 사용자가 문단을 드래그 후 우클릭 시 "nota로 캡처" 메뉴 표시
+      - 선택한 텍스트가 자동으로 메모 본문에 채워짐
+
+  - id: memo.hotkey
+    description: 메모창을 단축키로 실행
+    priority: P1
+    behavior:
+      - Alt+N 단축키로 메모 창 실행 가능
+      - 사용자가 옵션 페이지에서 단축키 변경 가능
+
+  - id: memo.tags
+    description: 태그 필터링 기능
+    priority: P2
+    behavior:
+      - 메모 본문에 입력된 #태그들을 자동 인식
+      - 추후 필터링 가능한 UI 지원
+
+  - id: scope.out
+    description: 현재 버전에서 제외된 항목
+    behavior:
+      - 실시간 클라우드 동기화 제외
+      - 크롬 외 브라우저, 협업 기능, 분석 수집, AI 요약 등은 범위 외

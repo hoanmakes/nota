@@ -102,8 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleAddToObsidian(memoId) {
     console.log("handleAddToObsidian called for memoId:", memoId);
 
-    const { obsidianVault } = await chrome.storage.sync.get('obsidianVault');
+    const { obsidianVault, obsidianFolder } = await chrome.storage.sync.get(['obsidianVault', 'obsidianFolder']);
     console.log("Retrieved vault name:", obsidianVault);
+    console.log("Retrieved folder path:", obsidianFolder);
 
     if (!obsidianVault) {
       alert('Obsidian Vault 이름이 설정되지 않았습니다. 확장 프로그램 옵션 페이지에서 설정해주세요.');
@@ -128,8 +129,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
     const slug = (memo.title || 'untitled').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    const fileName = `${yyyy}-${mm}-${dd}_${slug}.md`; // 'Nota/' 폴더 제거
-    console.log("Generated file name:", fileName);
+    let path = '';
+    if (obsidianFolder) {
+      // remove leading/trailing slashes and then add a single trailing slash
+      path = obsidianFolder.replace(/^\/|\/$/g, '') + '/';
+    }
+    const fileName = `${yyyy}-${mm}-${dd}_${slug}.md`;
+    const fullPath = `${path}${fileName}`;
+    console.log("Generated full path:", fullPath);
 
     const titlePart = `# ${memo.title || '제목 없음'}`;
     const urlPart = `> Source: ${memo.url}`;
@@ -138,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("Generated file content:", fileContent);
     
     const encodedVault = encodeURIComponent(obsidianVault);
-    const encodedFile = encodeURIComponent(fileName);
+    const encodedFile = encodeURIComponent(fullPath);
     const encodedContent = encodeURIComponent(fileContent);
 
     const obsidianUri = `obsidian://new?vault=${encodedVault}&file=${encodedFile}&content=${encodedContent}`;
