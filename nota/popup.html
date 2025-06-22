@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>nota 메모</title>
+  <title>nota Memo</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -11,8 +11,8 @@
     <!-- View: Memo List -->
     <div id="list-view">
       <header class="view-header">
-        <h1>내 메모</h1>
-        <button id="new-memo-btn" class="button-primary">새 메모</button>
+        <h1>My Memos</h1>
+        <button id="new-memo-btn" class="button-primary">New</button>
       </header>
       <div id="memo-list-container">
         <!-- Memos will be rendered here -->
@@ -23,15 +23,15 @@
     <div id="form-view" class="hidden">
        <header class="view-header">
         <button id="back-to-list-btn" class="button-icon">&larr;</button>
-        <h1 id="form-title">새 메모</h1>
+        <h1 id="form-title">New Memo</h1>
       </header>
       <form id="memo-form">
-        <input type="text" id="memo-title" placeholder="제목 (선택 사항)">
+        <input type="text" id="memo-title" placeholder="Title (optional)">
         <input type="text" id="memo-source" placeholder="Source URL" readonly>
-        <textarea id="memo-content" placeholder="메모할 내용을 입력하세요..." required></textarea>
+        <textarea id="memo-content" placeholder="Enter your note in markdown..." required></textarea>
         <input type="hidden" id="memo-id">
         <input type="hidden" id="memo-url">
-        <button type="submit" class="button-primary">저장</button>
+        <button type="submit" class="button-primary">Save</button>
       </form>
     </div>
 

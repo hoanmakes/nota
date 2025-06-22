@@ -6,7 +6,7 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "captureWithNota",
-    title: "nota로 캡처",
+    title: "Add as quote to new Nota memo",
     contexts: ["selection"]
   });
 });

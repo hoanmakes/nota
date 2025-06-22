@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const memo = await getMemo(memoId);
     if (memo) {
-      detailTitle.textContent = memo.title || '제목 없음';
+      detailTitle.textContent = memo.title || 'Untitled';
       const fullContent = `Source: ${memo.url}\n\n${memo.content}`;
       detailContent.textContent = fullContent;
       detailView.classList.remove('hidden');
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const memos = await getAllMemos();
 
     if (memos.length === 0) {
-      memoListContainer.innerHTML = '<p>저장된 메모가 없습니다.</p>';
+      memoListContainer.innerHTML = '<p>No memos saved.</p>';
       return;
     }
 
@@ -91,14 +91,14 @@ document.addEventListener('DOMContentLoaded', () => {
       div.dataset.id = memo.id;
       div.innerHTML = `
         <div class="memo-item-header">
-          <div class="memo-item-title">${memo.title || '제목 없음'}</div>
+          <div class="memo-item-title">${memo.title || 'Untitled'}</div>
         </div>
         <div class="memo-item-source">${memo.url || ''}</div>
         <div class="memo-item-content">${memo.content.substring(0, 80)}...</div>
         <div class="memo-item-actions">
            <button class="obsidian-btn" data-id="${memo.id}">Add to Obsidian</button>
-           <button class="download-btn" data-id="${memo.id}">.md 다운로드</button>
-           <button class="button-danger delete-btn" data-id="${memo.id}">삭제</button>
+           <button class="download-btn" data-id="${memo.id}">.md</button>
+           <button class="button-danger delete-btn" data-id="${memo.id}">Del</button>
         </div>
       `;
       memoListContainer.appendChild(div);
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileName = `${yyyy}-${mm}-${dd}_${hh}${min}_${slug}.md`;
 
     // 2. 파일 내용 생성 (# 제목\n> URL\n\n본문)
-    const titlePart = `# ${memo.title || '제목 없음'}`;
+    const titlePart = `# ${memo.title || 'Untitled'}`;
     const urlPart = `> ${memo.url}`;
     const fileContent = `${titlePart}\n${urlPart}\n\n${memo.content}`;
 
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullPath = `${path}${fileName}`;
     console.log("Generated full path:", fullPath);
 
-    const titlePart = `# ${memo.title || '제목 없음'}`;
+    const titlePart = `# ${memo.title || 'Untitled'}`;
     const urlPart = `Source: ${memo.url}`;
     const fileContent = `${titlePart}\n${urlPart}\n\n${memo.content}`;
     console.log("Generated file content:", fileContent);
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle button clicks
     if (target.tagName === 'BUTTON') {
       if (target.classList.contains('delete-btn')) {
-        if (confirm('정말로 이 메모를 삭제하시겠습니까?')) {
+        if (confirm('Are you sure you want to delete this memo?')) {
           await deleteMemo(memoId);
           renderMemos();
         }
