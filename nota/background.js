@@ -14,12 +14,24 @@ chrome.runtime.onInstalled.addListener(() => {
 // 컨텍스트 메뉴 클릭 리스너
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "captureWithNota") {
-    // 선택된 텍스트와 URL을 임시 저장 후 팝업을 여는 로직 (향후 구현)
-    console.log("Selected text:", info.selectionText);
-    console.log("Page URL:", info.pageUrl);
-    // 1. chrome.storage.local에 selectionText 저장
-    // 2. chrome.windows.create()로 popup.html을 작은 창으로 열거나,
-    //    사용자가 팝업을 열 때 storage를 확인하여 내용을 채우도록 유도
+    const selectionText = info.selectionText || '';
+    const pageUrl = info.pageUrl || '';
+    // 마크다운 인용구로 가공
+    const quoted = selectionText.split('\n').map(line => `> ${line}`).join('\n');
+    chrome.storage.local.set({
+      notaQuickMemo: {
+        content: quoted,
+        url: pageUrl
+      }
+    }, () => {
+      // popup.html을 작은 창으로 오픈 (옵션: 480x600)
+      chrome.windows.create({
+        url: chrome.runtime.getURL('popup.html'),
+        type: 'popup',
+        width: 480,
+        height: 600
+      });
+    });
   }
 });
 

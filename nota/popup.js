@@ -34,18 +34,29 @@ document.addEventListener('DOMContentLoaded', () => {
     formView.classList.remove('hidden');
     memoForm.reset();
     memoIdInput.value = '';
-    
-    // PRD: 현재 웹페이지 URL 자동 첨부 & 본문 포커스
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0] && tabs[0].url && tabs[0].url.startsWith('http')) {
-        const url = tabs[0].url;
-        memoUrlInput.value = url;
-        memoSource.value = url;
-        memoContent.value = ''; // Clear memo content area
+
+    // notaQuickMemo가 있으면 본문/URL 자동 입력만 하고 저장은 하지 않음
+    chrome.storage.local.get('notaQuickMemo', (result) => {
+      const quick = result.notaQuickMemo;
+      if (quick && quick.content) {
+        memoContent.value = quick.content;
+        memoUrlInput.value = quick.url || '';
+        memoSource.value = quick.url || '';
+        // 사용 후 삭제
+        chrome.storage.local.remove('notaQuickMemo');
+        memoContent.focus();
+        return;
       }
-      
-      // PRD: 커서는 본문 필드에 자동 포커스
-      memoContent.focus();
+      // PRD: 현재 웹페이지 URL 자동 첨부 & 본문 포커스
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0] && tabs[0].url && tabs[0].url.startsWith('http')) {
+          const url = tabs[0].url;
+          memoUrlInput.value = url;
+          memoSource.value = url;
+          memoContent.value = '';
+        }
+        memoContent.focus();
+      });
     });
   }
 
@@ -165,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("Generated full path:", fullPath);
 
     const titlePart = `# ${memo.title || '제목 없음'}`;
-    const urlPart = `> Source: ${memo.url}`;
+    const urlPart = `Source: ${memo.url}`;
     const fileContent = `${titlePart}\n${urlPart}\n\n${memo.content}`;
     console.log("Generated file content:", fileContent);
     
@@ -225,6 +236,13 @@ document.addEventListener('DOMContentLoaded', () => {
     switchToListView();
   });
 
-  // Initialize
-  initDB().then(renderMemos);
+  // popup이 열릴 때 notaQuickMemo가 있으면 바로 입력 화면으로 진입
+  chrome.storage.local.get('notaQuickMemo', (result) => {
+    if (result.notaQuickMemo && result.notaQuickMemo.content) {
+      switchToFormView();
+      return;
+    }
+    // 기본은 리스트 뷰
+    switchToListView();
+  });
 }); 
