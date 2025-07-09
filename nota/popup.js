@@ -19,12 +19,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const backToListFromDetailBtn = document.getElementById('back-to-list-from-detail-btn');
   const detailTitle = document.getElementById('detail-title');
+  const detailUrl = document.getElementById('detail-url');
   const detailContent = document.getElementById('detail-content');
+  const detailDownloadBtn = document.getElementById('detail-download-btn');
+  const detailDeleteBtn = document.getElementById('detail-delete-btn');
+  const detailObsidianBtn = document.getElementById('detail-obsidian-btn');
+
+  let currentMemoId = null;
 
   function switchToListView() {
     formView.classList.add('hidden');
     detailView.classList.add('hidden');
     listView.classList.remove('hidden');
+    currentMemoId = null;
     renderMemos();
   }
 
@@ -66,9 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const memo = await getMemo(memoId);
     if (memo) {
+      currentMemoId = memoId;
       detailTitle.textContent = memo.title || 'Untitled';
-      const fullContent = `Source: ${memo.url}\n\n${memo.content}`;
-      detailContent.textContent = fullContent;
+      // URL을 더 명확하게 표시
+      detailUrl.textContent = memo.url || '';
+      detailContent.textContent = memo.content;
       detailView.classList.remove('hidden');
     } else {
       // Memo not found, go back to list
@@ -91,14 +100,26 @@ document.addEventListener('DOMContentLoaded', () => {
       div.dataset.id = memo.id;
       div.innerHTML = `
         <div class="memo-item-header">
-          <div class="memo-item-title">${memo.title || 'Untitled'}</div>
+          <div class="memo-item-content-wrapper">
+            <div class="memo-item-title">${memo.title || 'Untitled'}</div>
+            <div class="memo-item-url">${memo.url || ''}</div>
+          </div>
+          <div class="memo-item-actions">
+            <button class="button-icon download-btn" data-id="${memo.id}">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 10V12.67C2 13.4 2.6 14 3.33 14H12.67C13.4 14 14 13.4 14 12.67V10M4.67 6.67L8 10M8 10L11.33 6.67M8 10V2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button class="button-danger delete-btn" data-id="${memo.id}">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 4H14M3.33 4V12.67C3.33 13.4 3.93 14 4.67 14H11.33C12.07 14 12.67 13.4 12.67 12.67V4M5.33 7.33V11.33M10.67 7.33V11.33M6.67 1.33H9.33" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
-        <div class="memo-item-source">${memo.url || ''}</div>
-        <div class="memo-item-content">${memo.content.substring(0, 80)}...</div>
-        <div class="memo-item-actions">
-           <button class="obsidian-btn" data-id="${memo.id}">Add to Obsidian</button>
-           <button class="download-btn" data-id="${memo.id}">.md</button>
-           <button class="button-danger delete-btn" data-id="${memo.id}">Del</button>
+        <div class="memo-item-content">${memo.content.substring(0, 150)}${memo.content.length > 150 ? '...' : ''}</div>
+        <div class="memo-item-bottom">
+          <button class="obsidian-btn" data-id="${memo.id}">Add to Obsidian</button>
         </div>
       `;
       memoListContainer.appendChild(div);
@@ -194,19 +215,29 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.tabs.create({ url: obsidianUri });
   }
 
+  async function handleDelete(memoId) {
+    if (confirm('Are you sure you want to delete this memo?')) {
+      await deleteMemo(memoId);
+      if (currentMemoId === memoId) {
+        switchToListView();
+      } else {
+        renderMemos();
+      }
+    }
+  }
+
+  // Event listeners
   memoListContainer.addEventListener('click', async (e) => {
     const target = e.target;
-    const memoId = Number(target.closest('.memo-item')?.dataset.id);
+    const memoItem = target.closest('.memo-item');
+    const memoId = Number(memoItem?.dataset.id);
 
     if (!memoId) return;
 
     // Handle button clicks
     if (target.tagName === 'BUTTON') {
       if (target.classList.contains('delete-btn')) {
-        if (confirm('Are you sure you want to delete this memo?')) {
-          await deleteMemo(memoId);
-          renderMemos();
-        }
+        handleDelete(memoId);
       } else if (target.classList.contains('download-btn')) {
         handleDownload(memoId);
       } else if (target.classList.contains('obsidian-btn')) {
@@ -216,7 +247,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Handle click on memo item to see detail
-    switchToDetailView(memoId);
+    if (!target.closest('button')) {
+      switchToDetailView(memoId);
+    }
+  });
+
+  // Detail view button handlers
+  detailDownloadBtn.addEventListener('click', () => {
+    if (currentMemoId) {
+      handleDownload(currentMemoId);
+    }
+  });
+
+  detailDeleteBtn.addEventListener('click', () => {
+    if (currentMemoId) {
+      handleDelete(currentMemoId);
+    }
+  });
+
+  detailObsidianBtn.addEventListener('click', () => {
+    if (currentMemoId) {
+      handleAddToObsidian(currentMemoId);
+    }
   });
 
   newMemoBtn.addEventListener('click', switchToFormView);

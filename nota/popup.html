@@ -11,7 +11,16 @@
     <!-- View: Memo List -->
     <div id="list-view">
       <header class="view-header">
-        <h1>My Memos</h1>
+        <div class="logo-container">
+          <div class="logo">
+            <span class="logo-text">nota</span>
+            <div class="logo-dots">
+              <div class="dot dot-1"></div>
+              <div class="dot dot-2"></div>
+              <div class="dot dot-3"></div>
+            </div>
+          </div>
+        </div>
         <button id="new-memo-btn" class="button-primary">New</button>
       </header>
       <div id="memo-list-container">
@@ -21,14 +30,33 @@
 
     <!-- View: Memo Form -->
     <div id="form-view" class="hidden">
-       <header class="view-header">
-        <button id="back-to-list-btn" class="button-icon">&larr;</button>
-        <h1 id="form-title">New Memo</h1>
+      <header class="view-header">
+        <h1 id="form-title">New</h1>
+        <button id="back-to-list-btn" class="button-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 4L12 12M4 12L12 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
       </header>
       <form id="memo-form">
-        <input type="text" id="memo-title" placeholder="Title (optional)">
-        <input type="text" id="memo-source" placeholder="Source URL" readonly>
-        <textarea id="memo-content" placeholder="Enter your note in markdown..." required></textarea>
+        <div class="form-field">
+          <div class="form-row">
+            <label class="form-label">Title</label>
+            <input type="text" id="memo-title" placeholder="(Optional)">
+          </div>
+        </div>
+        <div class="form-field">
+          <div class="form-row">
+            <label class="form-label">Source</label>
+            <input type="text" id="memo-source" placeholder="Current page URL" readonly>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="textarea-label">Memo</label>
+          <div class="textarea-container">
+            <textarea id="memo-content" placeholder="Enter your note here..." required></textarea>
+          </div>
+        </div>
         <input type="hidden" id="memo-id">
         <input type="hidden" id="memo-url">
         <button type="submit" class="button-primary">Save</button>
@@ -38,11 +66,34 @@
     <!-- View: Memo Detail -->
     <div id="detail-view" class="hidden">
       <header class="view-header">
-        <button id="back-to-list-from-detail-btn" class="button-icon">&larr;</button>
-        <h1 id="detail-title"></h1>
+        <div class="detail-header-content">
+          <button id="back-to-list-from-detail-btn" class="button-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3.33 8H12.67M3.33 8L8 3.33M3.33 8L8 12.67" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <h1>Memo</h1>
+        </div>
+        <div class="memo-item-actions">
+          <button id="detail-download-btn" class="button-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 10V12.67C2 13.4 2.6 14 3.33 14H12.67C13.4 14 14 13.4 14 12.67V10M4.67 6.67L8 10M8 10L11.33 6.67M8 10V2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button id="detail-delete-btn" class="button-danger">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 4H14M3.33 4V12.67C3.33 13.4 3.93 14 4.67 14H11.33C12.07 14 12.67 13.4 12.67 12.67V4M5.33 7.33V11.33M10.67 7.33V11.33M6.67 1.33H9.33" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
       </header>
       <div id="detail-content-container">
-        <pre id="detail-content"></pre>
+        <div class="detail-info">
+          <div id="detail-title" class="detail-title"></div>
+          <div id="detail-url" class="detail-url"></div>
+        </div>
+        <div id="detail-content"></div>
+        <button id="detail-obsidian-btn" class="obsidian-btn">Add to Obsidian</button>
       </div>
     </div>
   </div>
