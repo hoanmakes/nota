@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
             <button class="button-danger delete-btn" data-id="${memo.id}">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M2 4H14M3.33 4V12.67C3.33 13.4 3.93 14 4.67 14H11.33C12.07 14 12.67 13.4 12.67 12.67V4M5.33 7.33V11.33M10.67 7.33V11.33M6.67 1.33H9.33" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 4h12M4 4v10h8V4M6 2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
           </div>
@@ -268,6 +268,14 @@ document.addEventListener('DOMContentLoaded', () => {
   detailObsidianBtn.addEventListener('click', () => {
     if (currentMemoId) {
       handleAddToObsidian(currentMemoId);
+    }
+  });
+
+  // Detail URL click handler - open link in new tab
+  detailUrl.addEventListener('click', () => {
+    const url = detailUrl.textContent.trim();
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+      chrome.tabs.create({ url: url });
     }
   });
 
