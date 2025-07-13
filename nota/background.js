@@ -5,21 +5,21 @@
 // 우클릭 컨텍스트 메뉴 생성
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: "captureWithNota",
-    title: "Add as quote to new Nota memo",
+    id: "captureWithPickaxe",
+    title: "Add as quote to new Pickaxe memo",
     contexts: ["selection"]
   });
 });
 
 // 컨텍스트 메뉴 클릭 리스너
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "captureWithNota") {
+  if (info.menuItemId === "captureWithPickaxe") {
     const selectionText = info.selectionText || '';
     const pageUrl = info.pageUrl || '';
     // 마크다운 인용구로 가공
     const quoted = selectionText.split('\n').map(line => `> ${line}`).join('\n');
     chrome.storage.local.set({
-      notaQuickMemo: {
+      pickaxeQuickMemo: {
         content: quoted,
         url: pageUrl
       }

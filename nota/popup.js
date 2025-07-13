@@ -1,7 +1,17 @@
 // popup.js
 import { initDB, addMemo, getAllMemos, getMemo, deleteMemo } from './db.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // DB 초기화를 시작 시점에 한 번만 수행
+  try {
+    await initDB();
+    console.log('Database initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize database:', error);
+    alert('Failed to initialize database. Please reload the extension.');
+    return;
+  }
+
   const listView = document.getElementById('list-view');
   const formView = document.getElementById('form-view');
   const detailView = document.getElementById('detail-view');
@@ -27,6 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentMemoId = null;
 
+  // HTML 이스케이프 함수 추가
+  function escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   function switchToListView() {
     formView.classList.add('hidden');
     detailView.classList.add('hidden');
@@ -42,15 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
     memoForm.reset();
     memoIdInput.value = '';
 
-    // notaQuickMemo가 있으면 본문/URL 자동 입력만 하고 저장은 하지 않음
-    chrome.storage.local.get('notaQuickMemo', (result) => {
-      const quick = result.notaQuickMemo;
+    // pickaxeQuickMemo가 있으면 본문/URL 자동 입력만 하고 저장은 하지 않음
+    chrome.storage.local.get('pickaxeQuickMemo', (result) => {
+      const quick = result.pickaxeQuickMemo;
       if (quick && quick.content) {
         memoContent.value = quick.content;
         memoUrlInput.value = quick.url || '';
         memoSource.value = quick.url || '';
         // 사용 후 삭제
-        chrome.storage.local.remove('notaQuickMemo');
+        chrome.storage.local.remove('pickaxeQuickMemo');
         memoContent.focus();
         return;
       }
@@ -87,12 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function renderMemos() {
     memoListContainer.innerHTML = '';
-    const memos = await getAllMemos();
+    
+    try {
+      const memos = await getAllMemos();
 
-    if (memos.length === 0) {
-      memoListContainer.innerHTML = '<p>No memos saved.</p>';
-      return;
-    }
+      if (memos.length === 0) {
+        memoListContainer.innerHTML = '<p>No memos saved.</p>';
+        return;
+      }
 
     memos.forEach(memo => {
       const div = document.createElement('div');
@@ -101,29 +123,33 @@ document.addEventListener('DOMContentLoaded', () => {
       div.innerHTML = `
         <div class="memo-item-header">
           <div class="memo-item-content-wrapper">
-            <div class="memo-item-title">${memo.title || 'Untitled'}</div>
-            <div class="memo-item-url">${memo.url || ''}</div>
+            <div class="memo-item-title">${escapeHtml(memo.title || 'Untitled')}</div>
+            <div class="memo-item-url">${escapeHtml(memo.url || '')}</div>
           </div>
           <div class="memo-item-actions">
-            <button class="button-icon download-btn" data-id="${memo.id}">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <button class="button-icon download-btn" data-id="${memo.id}" title="Markdown Download" aria-label="Download as Markdown">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M2 10V12.67C2 13.4 2.6 14 3.33 14H12.67C13.4 14 14 13.4 14 12.67V10M4.67 6.67L8 10M8 10L11.33 6.67M8 10V2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
-            <button class="button-danger delete-btn" data-id="${memo.id}">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <button class="button-danger delete-btn" data-id="${memo.id}" title="Delete" aria-label="Delete memo">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M2 4h12M4 4v10h8V4M6 2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
           </div>
         </div>
-        <div class="memo-item-content">${memo.content.substring(0, 150)}${memo.content.length > 150 ? '...' : ''}</div>
+        <div class="memo-item-content">${escapeHtml(memo.content.substring(0, 150))}${memo.content.length > 150 ? '...' : ''}</div>
         <div class="memo-item-bottom">
           <button class="obsidian-btn" data-id="${memo.id}">Add to Obsidian</button>
         </div>
       `;
       memoListContainer.appendChild(div);
     });
+    } catch (error) {
+      console.error('Failed to render memos:', error);
+      memoListContainer.innerHTML = '<p>Error loading memos. Please reload the extension.</p>';
+    }
   }
 
   async function handleDownload(memoId) {
@@ -154,7 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // 약간의 지연 후 URL 해제하여 다운로드 완료 보장
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   }
 
   async function handleAddToObsidian(memoId) {
@@ -165,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("Retrieved folder path:", obsidianFolder);
 
     if (!obsidianVault) {
-      alert('Obsidian Vault 이름이 설정되지 않았습니다. 확장 프로그램 옵션 페이지에서 설정해주세요.');
+      alert('Obsidian Vault name is not configured. Please set it up in the extension options page.');
       if (chrome.runtime.openOptionsPage) {
         chrome.runtime.openOptionsPage();
       } else {
@@ -232,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const memoItem = target.closest('.memo-item');
     const memoId = Number(memoItem?.dataset.id);
 
-    if (!memoId) return;
+    if (!memoItem || isNaN(memoId)) return;
 
     // Handle button clicks
     if (target.tagName === 'BUTTON') {
@@ -285,20 +312,35 @@ document.addEventListener('DOMContentLoaded', () => {
   
   memoForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const memo = {
-      title: memoTitle.value,
-      content: memoContent.value, // Now only user's note
-      url: memoUrlInput.value,
-      createdAt: new Date().toISOString()
-    };
     
-    await addMemo(memo);
-    switchToListView();
+    const submitButton = memoForm.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    
+    try {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Saving...';
+      
+      const memo = {
+        title: memoTitle.value,
+        content: memoContent.value, // Now only user's note
+        url: memoUrlInput.value,
+        createdAt: new Date().toISOString()
+      };
+      
+      await addMemo(memo);
+      switchToListView();
+    } catch (error) {
+      console.error('Failed to save memo:', error);
+      alert('Failed to save memo. Please try again.');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
+    }
   });
 
-  // popup이 열릴 때 notaQuickMemo가 있으면 바로 입력 화면으로 진입
-  chrome.storage.local.get('notaQuickMemo', (result) => {
-    if (result.notaQuickMemo && result.notaQuickMemo.content) {
+  // popup이 열릴 때 pickaxeQuickMemo가 있으면 바로 입력 화면으로 진입
+  chrome.storage.local.get('pickaxeQuickMemo', (result) => {
+    if (result.pickaxeQuickMemo && result.pickaxeQuickMemo.content) {
       switchToFormView();
       return;
     }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>nota Memo</title>
+  <title>Pickaxe Memo</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -12,8 +12,9 @@
     <div id="list-view">
       <header class="view-header">
         <div class="logo-container">
-          <div class="logo">
-            <h1 class="logo-text">Pickax.</h1>
+          <div class="logo" style="align-items: end;">
+            <img src="icons/icon128.png" alt="Pickaxe icon" class="logo-image" style="width: 40px; height: 40px;">
+            <img src="icons/logo.png" alt="Pickaxe" class="logo-image" style="height: 24px;">
           </div>
         </div>
         <button id="new-memo-btn" class="button-primary">New</button>
@@ -27,8 +28,8 @@
     <div id="form-view" class="hidden">
       <header class="view-header">
         <h1 id="form-title">New</h1>
-        <button id="back-to-list-btn" class="button-icon">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <button id="back-to-list-btn" class="button-icon" aria-label="Back to list">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M4 4L12 12M4 12L12 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </button>
@@ -37,7 +38,7 @@
         <div class="form-field">
           <div class="form-row">
             <label class="form-label">Title</label>
-            <input type="text" id="memo-title" placeholder="Optional">
+            <input type="text" id="memo-title" placeholder="(Optional)">
           </div>
         </div>
         <div class="form-field">
@@ -46,10 +47,10 @@
             <input type="text" id="memo-source" placeholder="sampleurl.com/page" readonly>
           </div>
         </div>
-        <div class="form-field">
+        <div class="form-field" style="margin-top: 16px;">
           <label class="textarea-label">Memo</label>
           <div class="textarea-container">
-            <textarea id="memo-content" placeholder="Value" required></textarea>
+            <textarea id="memo-content" placeholder="What's on your mind about this page?" required></textarea>
           </div>
         </div>
         <input type="hidden" id="memo-id">
@@ -62,21 +63,21 @@
     <div id="detail-view" class="hidden">
       <header class="view-header">
         <div class="detail-header-content">
-          <button id="back-to-list-from-detail-btn" class="button-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <button id="back-to-list-from-detail-btn" class="button-icon" aria-label="Back to list">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M3.33 8H12.67M3.33 8L8 3.33M3.33 8L8 12.67" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
           <h1>Memo</h1>
         </div>
         <div class="memo-item-actions">
-          <button id="detail-download-btn" class="button-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <button id="detail-download-btn" class="button-icon" title="Markdown Download" aria-label="Download as Markdown">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M2 10V12.67C2 13.4 2.6 14 3.33 14H12.67C13.4 14 14 13.4 14 12.67V10M4.67 6.67L8 10M8 10L11.33 6.67M8 10V2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
-          <button id="detail-delete-btn" class="button-danger">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <button id="detail-delete-btn" class="button-danger" title="Delete" aria-label="Delete memo">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M2 4h12M4 4v10h8V4M6 2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>

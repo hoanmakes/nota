@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "nota - 웹 캡처 & Markdown 메모 확장 도구",
+  "name": "Pickaxe - 웹 캡처 & Markdown 메모 확장 도구",
   "version": "1.0.0",
   "description": "웹페이지에서 메모를 남기고, URL과 함께 Markdown(.md)으로 저장하는 오프라인 크롬 확장 프로그램.",
   "icons": {

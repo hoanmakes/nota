@@ -1,21 +1,31 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>nota 옵션</title>
+  <title>Pickaxe Settings</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
-  <h1>옵션</h1>
-  <form id="options-form">
-    <label for="obsidian-vault">Obsidian Vault 이름:</label>
-    <input type="text" id="obsidian-vault" placeholder="내 Vault 이름" required>
-    <label for="obsidian-folder">폴더 경로 (선택 사항):</label>
-    <input type="text" id="obsidian-folder" placeholder="예: InBox/Web Clips (미입력 시 최상위)">
-    <button type="submit">저장</button>
-  </form>
-  <p id="status-message"></p>
+  <div class="container">
+    <h1>Pickaxe Settings</h1>
+    <form id="options-form">
+      <div class="form-field">
+        <label for="obsidian-vault">Obsidian Vault Name:</label>
+        <input type="text" id="obsidian-vault" placeholder="Your vault name" required>
+        <div class="help-text">Enter the exact name of your Obsidian vault</div>
+      </div>
+      
+      <div class="form-field">
+        <label for="obsidian-folder">Folder Path (Optional):</label>
+        <input type="text" id="obsidian-folder" placeholder="e.g. Inbox/Web Clips">
+        <div class="help-text">Leave empty to save in vault root, or specify a folder path</div>
+      </div>
+      
+      <button type="submit">Save Settings</button>
+    </form>
+    <div id="status-message"></div>
+  </div>
   <script src="options.js"></script>
 </body>
 </html> 
